@@ -1,0 +1,102 @@
+//  Simple DH key exchange using AmiSSL 
+/*
+static void do_dh_exchange(int sock) {
+    DH *dh = IAmiSSL->DH_get_2048_256();  // Predefined group
+    if (!dh) fatal("DH group init failed");
+
+    if (IAmiSSL->DH_generate_key(dh) != 1) fatal("DH keygen failed");
+
+    // 1. Send server public key 
+    const BIGNUM *pub_key = NULL;
+    IAmiSSL->DH_get0_key(dh, &pub_key, NULL);
+    int pub_len = BN_num_bytes(pub_key);
+    unsigned char *pub_buf = malloc(pub_len);
+    IAmiSSL->BN_bn2bin(pub_key, pub_buf);
+
+    uint32_t len = htonl(pub_len);
+    send_all(sock, &len, 4);
+    send_all(sock, pub_buf, pub_len);
+
+    // 2. Receive client public key 
+    uint32_t clen_net;
+    recv_all(sock, &clen_net, 4);
+    int clen = ntohl(clen_net);
+    unsigned char *client_pub = malloc(clen);
+    recv_all(sock, client_pub, clen);
+
+    BIGNUM *client_pub_bn = IAmiSSL->BN_bin2bn(client_pub, clen, NULL);
+
+    // 3. Compute shared secret 
+    unsigned char secret[256];
+    int secret_len = IAmiSSL->DH_compute_key(secret, client_pub_bn, dh);
+    if (secret_len <= 0) fatal("DH_compute_key failed");
+    printf("DH shared secret computed (%d bytes)\n", secret_len);
+
+    // 4. Derive AES + HMAC keys using SHA256 
+    unsigned char aes_key[32];
+    unsigned char hmac_key[32];
+    SHA256_CTX ctx;
+    IAmiSSL->SHA256_Init(&ctx);
+    IAmiSSL->SHA256_Update(&ctx, secret, secret_len);
+    IAmiSSL->SHA256_Final(aes_key, &ctx);
+
+    // Derive another key variation for HMAC 
+    IAmiSSL->SHA256_Init(&ctx);
+    IAmiSSL->SHA256_Update(&ctx, aes_key, 32);
+    IAmiSSL->SHA256_Final(hmac_key, &ctx);
+
+    printf("Keys derived.\n");
+
+    EVP_CIPHER_CTX *enc_ctx = IAmiSSL->EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX *dec_ctx = IAmiSSL->EVP_CIPHER_CTX_new();
+    IAmiSSL->EVP_EncryptInit_ex(enc_ctx, IAmiSSL->EVP_aes_128_ctr(), NULL, aes_key, aes_key + 16);
+    IAmiSSL->EVP_DecryptInit_ex(dec_ctx, IAmiSSL->EVP_aes_128_ctr(), NULL, aes_key, aes_key + 16);
+
+    // Example: send encrypted "hello" packet 
+    unsigned char plaintext[] = "hello over SSH-TRANS";
+    unsigned char ciphertext[64];
+    int outlen;
+    IAmiSSL->EVP_EncryptUpdate(enc_ctx, ciphertext, &outlen, plaintext, strlen((char*)plaintext));
+    send_all(sock, ciphertext, outlen);
+    printf("Encrypted packet sent.\n");
+
+    IAmiSSL->EVP_CIPHER_CTX_free(enc_ctx);
+    IAmiSSL->EVP_CIPHER_CTX_free(dec_ctx);
+    IAmiSSL->BN_free(client_pub_bn);
+    free(pub_buf);
+    free(client_pub);
+    IAmiSSL->DH_free(dh);
+}
+*/
+
+/*
+    int sock = ISocket->socket(AF_INET, SOCK_STREAM, 0);
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(2222);
+    addr.sin_addr.s_addr = INADDR_ANY;
+
+    ISocket->bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+    ISocket->listen(sock, 1);
+    printf("SSH transport demo listening on port 2222...\n");
+
+    int client = accept(sock, NULL, NULL);
+    printf("Client connected.\n");
+
+    // 1. Exchange protocol versions 
+    char buffer[BUF_SZ];
+    snprintf(buffer, sizeof(buffer), "%s\r\n", SSH_VERSION);
+    send_all(client, buffer, strlen(buffer));
+    recv(client, buffer, sizeof(buffer), 0);
+    printf("Client version: %s\n", buffer);
+
+    // 2. Key exchange 
+    do_dh_exchange(client);
+
+    printf("Transport demo complete.\n");
+    ISocket->CloseSocket(client);
+    ISocket->CloseSocket(sock);
+*/
+
+
+

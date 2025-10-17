@@ -1,0 +1,4 @@
+{
+  "image": "walkero/amigagccondocker:os4-gcc11",
+  "remoteUser": "amidev"
+}
