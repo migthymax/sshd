@@ -21,7 +21,7 @@
 #include "error.h"
 #include "interfaces.h"
 #include "ssh_identification.h"
-
+#include "ssh_algorithms.h"
 
 static const char USED min_stack_cookie[] = "$STACK:102400";
 
@@ -36,6 +36,14 @@ struct AmiSSLMasterIFace	*IAmiSSLMaster;
 struct AmiSSLIFace			*IAmiSSL;
 struct ZIFace				*IZ;
 
+char kex[128];
+char hostkey[128];
+char cipher_c2s[128];
+char cipher_s2c[128];
+char mac_c2s[128];
+char mac_s2c[128];
+char comp_c2s[32];
+char comp_s2c[32];
 
 
 void setDefaultArguments( LONG args[] ) {
@@ -252,6 +260,16 @@ int start( LONG args[],void (*handleError)( CONST_STRPTR) ) {
 
 		goto exit_socket;
 	}
+
+
+	ssh_build_namelist_kex( kex,sizeof( kex ) );
+	ssh_build_namelist_hostkey( hostkey,sizeof( hostkey ) );
+	ssh_build_namelist_cipher( cipher_c2s,sizeof(cipher_c2s ) );
+	ssh_build_namelist_cipher( cipher_s2c,sizeof(cipher_s2c ) );
+	ssh_build_namelist_mac( mac_c2s,sizeof(mac_c2s ) );
+	ssh_build_namelist_mac( mac_s2c,sizeof(mac_s2c ) );
+	ssh_build_namelist_compression( comp_c2s,sizeof( comp_c2s ) );
+	ssh_build_namelist_compression( comp_s2c,sizeof( comp_s2c ) );
 
 	// HERE Ready to go
 	result = loop( args,handleError );
